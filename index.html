@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pianificazione dei Pasti – Estate</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #fdf6ec;
+    --warm-white: #fffdf8;
+    --terracotta: #c4622d;
+    --terracotta-light: #e8a07a;
+    --sage: #7a9e7e;
+    --sage-light: #b5ceb8;
+    --gold: #c8973a;
+    --gold-light: #f0d49a;
+    --ink: #2d2417;
+    --ink-mid: #5c4a32;
+    --ink-light: #9c835f;
+    --line: #e8dcc8;
+    --line-dark: #d4c4a8;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--cream);
+    font-family: 'Lato', sans-serif;
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(180,160,120,0.12) 27px, rgba(180,160,120,0.12) 28px);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .page-wrapper {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px 16px 60px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .header {
+    text-align: center;
+    padding: 36px 20px 28px;
+    border-bottom: 2px solid var(--terracotta);
+    margin-bottom: 32px;
+  }
+
+  .header-subtitle {
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--terracotta);
+    margin-bottom: 8px;
+  }
+
+  .header-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(26px, 5vw, 42px);
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.15;
+    margin-bottom: 6px;
+  }
+
+  .header-season {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 16px;
+    color: var(--gold);
+    margin-top: 4px;
+  }
+
+  .header-family {
+    margin-top: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--gold-light);
+    border-radius: 20px;
+    padding: 5px 16px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ink-mid);
+    letter-spacing: 0.5px;
+  }
+
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 260px;
+    gap: 28px;
+    align-items: start;
+  }
+
+  @media (max-width: 680px) {
+    .main-grid { grid-template-columns: 1fr; }
+  }
+
+  .days-column { display: flex; flex-direction: column; gap: 0; }
+
+  .day-block {
+    border-bottom: 1px solid var(--line-dark);
+    padding: 0 0 18px 0;
+    margin-bottom: 18px;
+    animation: fadeSlide 0.5s ease both;
+  }
+
+  .day-block:last-child { border-bottom: none; }
+
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .day-block:nth-child(1) { animation-delay: 0.05s; }
+  .day-block:nth-child(2) { animation-delay: 0.10s; }
+  .day-block:nth-child(3) { animation-delay: 0.15s; }
+  .day-block:nth-child(4) { animation-delay: 0.20s; }
+  .day-block:nth-child(5) { animation-delay: 0.25s; }
+  .day-block:nth-child(6) { animation-delay: 0.30s; }
+  .day-block:nth-child(7) { animation-delay: 0.35s; }
+
+  .day-label {
+    font-family: 'Lato', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .day-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+  }
+
+  .meals-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .meal-box {
+    background: var(--warm-white);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 10px 13px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .meal-box:hover {
+    border-color: var(--terracotta-light);
+    box-shadow: 0 2px 10px rgba(196,98,45,0.08);
+  }
+
+  /* Pizza asporto box */
+  .meal-box.asporto {
+    background: #fff7f0;
+    border-color: #f0c4a0;
+  }
+
+  .meal-type {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+
+  .meal-type.pranzo { color: var(--sage); }
+  .meal-type.cena   { color: var(--terracotta); }
+
+  .meal-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--ink);
+    line-height: 1.3;
+  }
+
+  .meal-note {
+    font-size: 10px;
+    color: var(--ink-light);
+    margin-top: 3px;
+    font-style: italic;
+  }
+
+  .quick-badge {
+    display: inline-block;
+    background: var(--sage-light);
+    color: #4a7a4e;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border-radius: 4px;
+    padding: 1px 5px;
+    margin-top: 4px;
+  }
+
+  .asporto-badge {
+    display: inline-block;
+    background: #fde8d4;
+    color: var(--terracotta);
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border-radius: 4px;
+    padding: 1px 5px;
+    margin-top: 4px;
+  }
+
+  .day-block.weekend .meal-box {
+    background: #fff9f5;
+    border-color: #f0d4c0;
+  }
+
+  .day-block.weekend .day-label { color: var(--terracotta); }
+
+  /* Sidebar */
+  .sidebar { position: sticky; top: 20px; }
+
+  .spesa-card {
+    background: var(--warm-white);
+    border: 1px solid var(--line-dark);
+    border-radius: 12px;
+    padding: 20px 18px;
+    animation: fadeSlide 0.5s ease 0.4s both;
+  }
+
+  .spesa-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line-dark);
+  }
+
+  .spesa-section { margin-bottom: 14px; }
+
+  .spesa-section-title {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--terracotta);
+    margin-bottom: 7px;
+  }
+
+  .spesa-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 4px 0;
+    border-bottom: 1px dashed var(--line);
+    font-size: 12.5px;
+    color: var(--ink-mid);
+    cursor: pointer;
+    transition: opacity 0.2s;
+    user-select: none;
+  }
+
+  .spesa-item:last-child { border-bottom: none; }
+
+  .spesa-item.checked {
+    opacity: 0.4;
+    text-decoration: line-through;
+  }
+
+  .check-box {
+    width: 13px;
+    height: 13px;
+    border: 1.5px solid var(--line-dark);
+    border-radius: 3px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    transition: background 0.15s, border-color 0.15s;
+  }
+
+  .spesa-item.checked .check-box {
+    background: var(--sage);
+    border-color: var(--sage);
+    color: white;
+  }
+
+  .spesa-qty {
+    font-size: 10px;
+    color: var(--ink-light);
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
+  .print-btn {
+    display: block;
+    width: 100%;
+    margin-top: 14px;
+    padding: 9px;
+    background: var(--terracotta);
+    color: white;
+    border: none;
+    border-radius: 7px;
+    font-family: 'Lato', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .print-btn:hover { background: var(--ink-mid); }
+
+  @media print {
+    body::before { display: none; }
+    .print-btn { display: none; }
+    .sidebar { position: static; }
+    .main-grid { grid-template-columns: 1fr 220px; }
+  }
+</style>
+</head>
+<body>
+<div class="page-wrapper">
+
+  <header class="header">
+    <div class="header-subtitle">Settimana del 9–15 Giugno 2025</div>
+    <h1 class="header-title">Pianificazione dei Pasti</h1>
+    <div class="header-season">☀ Menu Estivo</div>
+    <div class="header-family">👨‍👩‍👧‍👦 &nbsp; 2 adulti · 2 bambini</div>
+  </header>
+
+  <div class="main-grid">
+    <div class="days-column">
+
+      <!-- LUNEDÌ -->
+      <div class="day-block">
+        <div class="day-label">Lunedì</div>
+        <div class="meals-row">
+          <div class="meal-box">
+            <div class="meal-type pranzo">Pranzo</div>
+            <div class="meal-name">Wrap con pollo e verdure grigliate</div>
+            <div class="meal-note">Tortilla, avocado, pomodorini, yogurt</div>
+            <span class="quick-badge">⚡ veloce</span>
+          </div>
+          <div class="meal-box">
+            <div class="meal-type cena">Cena</div>
+            <div class="meal-name">Insalata di riso estiva</div>
+            <div class="meal-note">Tonno, olive, mais, pomodorini, uova sode</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MARTEDÌ -->
+      <div class="day-block">
+        <div class="day-label">Martedì</div>
+        <div class="meals-row">
+          <div class="meal-box">
+            <div class="meal-type pranzo">Pranzo</div>
+            <div class="meal-name">Sandwich caprese</div>
+            <div class="meal-note">Mozzarella, basilico, pomodoro, pesto</div>
+            <span class="quick-badge">⚡ veloce</span>
+          </div>
+          <div class="meal-box">
+            <div class="meal-type cena">Cena</div>
+            <div class="meal-name">Pollo al limone con patate</div>
+            <div class="meal-note">Al forno con rosmarino, veloce da preparare</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MERCOLEDÌ -->
+      <div class="day-block">
+        <div class="day-label">Mercoledì</div>
+        <div class="meals-row">
+          <div class="meal-box">
+            <div class="meal-type pranzo">Pranzo</div>
+            <div class="meal-name">Poke bowl estivo</div>
+            <div class="meal-note">Riso, salmone, avocado, edamame</div>
+            <span class="quick-badge">⚡ veloce</span>
+          </div>
+          <div class="meal-box">
+            <div class="meal-type cena">Cena</div>
+            <div class="meal-name">Frittata di verdure</div>
+            <div class="meal-note">Zucchine, patate, cipolla + insalata fresca</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GIOVEDÌ -->
+      <div class="day-block">
+        <div class="day-label">Giovedì</div>
+        <div class="meals-row">
+          <div class="meal-box">
+            <div class="meal-type pranzo">Pranzo</div>
+            <div class="meal-name">Bruschette al pomodoro</div>
+            <div class="meal-note">+ mozzarella di bufala e basilico</div>
+            <span class="quick-badge">⚡ veloce</span>
+          </div>
+          <div class="meal-box">
+            <div class="meal-type cena">Cena</div>
+            <div class="meal-name">Zuppa di legumi fredda</div>
+            <div class="meal-note">Ceci, pomodoro, carote + crostini</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VENERDÌ -->
+      <div class="day-block">
+        <div class="day-label">Venerdì</div>
+        <div class="meals-row">
+          <div class="meal-box">
+            <div class="meal-type pranzo">Pranzo</div>
+            <div class="meal-name">Yogurt + frutta fresca</div>
+            <div class="meal-note">Pesche, anguria, granola</div>
+            <span class="quick-badge">⚡ veloce</span>
+          </div>
+          <div class="meal-box asporto">
+            <div class="meal-type cena">Cena</div>
+            <div class="meal-name">🍕 Pizza — asporto</div>
+            <div class="meal-note">Serata relax in famiglia!</div>
+            <span class="asporto-badge">📦 da asporto</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SABATO -->
+      <div class="day-block weekend">
+        <div class="day-label">Sabato</div>
+        <div class="meals-row">
+          <div class="meal-box">
+            <div class="meal-type pranzo">Pranzo</div>
+            <div class="meal-name">Focaccia estiva</div>
+            <div class="meal-note">Pomodorini, olive, origano, zucchine</div>
+          </div>
+          <div class="meal-box">
+            <div class="meal-type cena">Cena</div>
+            <div class="meal-name">Polpette al sugo di pomodoro</div>
+            <div class="meal-note">Con pane o patate al forno — piacciono a tutti!</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DOMENICA -->
+      <div class="day-block weekend">
+        <div class="day-label">Domenica</div>
+        <div class="meals-row">
+          <div class="meal-box">
+            <div class="meal-type pranzo">Pranzo</div>
+            <div class="meal-name">Risotto allo zafferano</div>
+            <div class="meal-note">Cremoso, classico, amato dai bambini</div>
+          </div>
+          <div class="meal-box">
+            <div class="meal-type cena">Cena</div>
+            <div class="meal-name">Minestrone estivo + uova sode</div>
+            <div class="meal-note">Leggero, con verdure di stagione</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /days-column -->
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="spesa-card">
+        <div class="spesa-title">🛒 Lista della spesa</div>
+
+        <div class="spesa-section">
+          <div class="spesa-section-title">Freschissimi</div>
+          <div class="spesa-item" onclick="toggle(this)"><div class="check-box"></div>Pomodorini <span class="spesa-qty">1 kg</span></div>
+          <div class="spesa-item" onclick="toggle(this)"><div class="check-box"></div>Avocado <span class="spesa-qty">3</span></div>
+          <div class="spesa-item" onclick="toggle(this)"><div class="check-box"></div>Mozzarella di bufala <span class="spesa-qty">2</span></div>
+          <div class="spesa-item" onclick="toggle(this)"><div class="check-box"></div>Basilico fresco <span class="spesa-qty">1 mazzo</span></div>
+          <div class="spesa-item" onclick="toggle(this)"><div class="check-box"></div>Limoni <span class="spesa-qty">4</span></div>
+          <div class="spesa-item" onclick="toggle(this)"><div class="check-box"></div>Zucchine <span class="spesa-qty">4</span></div>
+          <div class="spesa-item" onclick="toggle(this)"><div class="check-box"></div>Patate <span class="spesa-qty">1 kg</span></div>
+          <div class="spesa-item" onclick="toggle(this)"><div class="check-box"></div>Carote <span class="spesa-qty">4</span></div>
+          <div class="spesa-item" onclick="toggle(this)"><div class="check-box"></div>Pesche / anguria <span class="spesa-qty">q.b.</span></div>
+          <div class="spesa-item" onclick="toggle(this)"><div class="check-box"></div>Cipolla <span class="spesa-qty">2</span></div>
+        </div>
+
+        <div class="spesa-section">
+          <div class="spesa-section-title">Proteine</div>
+          <div class="spesa-item" onclick="toggle(this)"><div class="check-box"></div>Petto di pollo <span class="spesa-qty">700 g</span></div>
+          <div class="spesa-item" onclick="toggle(this)"><div class="check-box"></div>Carne macinata (polpette) <span class="spesa-qty">500 g</span></div>
+          <div class="spesa-item" onclick="toggle(this)"><div class="check-box"></div>Salmone fresco <span class="spesa-qty">400 g</span></div>
+          <div class="spesa-item" onclick="toggle(this)"><div class="check-box"></div>Tonno in scatola <span class="spesa-qty">3 latt.</span></div>
+          <div class="spesa-item" onclick="toggle(this)"><div class="check-box"></div>Uova <span class="spesa-qty">10</span></div>
+        </div>
+
+        <div class="spesa-section">
+          <div class="spesa-section-title">Dispensa</div>
+          <div class="spesa-item" onclick="toggle(this)"><div class="check-box"></div>Riso (per insalata + risotto)</div>
+          <div class="spesa-item" onclick="toggle(this)"><div class="check-box"></div>Tortilla / pane per sandwich</div>
+          <div class="spesa-item" onclick="toggle(this)"><div class="check-box"></div>Pane / focaccia base</div>
+          <div class="spesa-item" onclick="toggle(this)"><div class="check-box"></div>Ceci in lattina <span class="spesa-qty">2 latt.</span></div>
+          <div class="spesa-item" onclick="toggle(this)"><div class="check-box"></div>Mais in lattina <span class="spesa-qty">1 latt.</span></div>
+          <div class="spesa-item" onclick="toggle(this)"><div class="check-box"></div>Olive, capperi</div>
+          <div class="spesa-item" onclick="toggle(this)"><div class="check-box"></div>Edamame (surgelati)</div>
+          <div class="spesa-item" onclick="toggle(this)"><div class="check-box"></div>Pesto al basilico (vasetto)</div>
+          <div class="spesa-item" onclick="toggle(this)"><div class="check-box"></div>Zafferano <span class="spesa-qty">2 bustine</span></div>
+          <div class="spesa-item" onclick="toggle(this)"><div class="check-box"></div>Yogurt greco <span class="spesa-qty">4 vasetti</span></div>
+          <div class="spesa-item" onclick="toggle(this)"><div class="check-box"></div>Granola</div>
+          <div class="spesa-item" onclick="toggle(this)"><div class="check-box"></div>Passata di pomodoro <span class="spesa-qty">1 bott.</span></div>
+        </div>
+
+        <button class="print-btn" onclick="window.print()">🖨 Stampa / Salva PDF</button>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<script>
+function toggle(el) {
+  el.classList.toggle('checked');
+  const box = el.querySelector('.check-box');
+  box.textContent = el.classList.contains('checked') ? '✓' : '';
+}
+</script>
+</body>
+</html>
